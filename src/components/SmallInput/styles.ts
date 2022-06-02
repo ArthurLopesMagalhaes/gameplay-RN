@@ -13,5 +13,7 @@ export const styles = StyleSheet.create({
     borderRadius: 8,
     textAlign: "center",
     marginTop: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.secondary50,
   },
 });

@@ -34,10 +34,17 @@ export const AppointmentCreate = () => {
   const handleOpenGuilds = () => {
     setOpenGuildsModal(true);
   };
+  const handleCloseGuilds = () => {
+    setOpenGuildsModal(false);
+  };
 
   const handleGuildSelect = (guildSelect: GuildProps) => {
     setGuild(guildSelect);
     setOpenGuildsModal(false);
+  };
+
+  const handleCategorySelect = (categoryId: string) => {
+    setCategory(categoryId);
   };
 
   return (
@@ -59,7 +66,7 @@ export const AppointmentCreate = () => {
 
           <CategorySelect
             hasCheckBox
-            setCategory={setCategory}
+            setCategory={handleCategorySelect}
             categorySelected={category}
           />
 
@@ -115,7 +122,7 @@ export const AppointmentCreate = () => {
           </View>
         </Background>
       </ScrollView>
-      <ModalView visible={openGuildsModal}>
+      <ModalView visible={openGuildsModal} closeModal={handleCloseGuilds}>
         <Guilds handleGuildSelect={handleGuildSelect} />
       </ModalView>
     </KeyboardAvoidingView>

@@ -23,6 +23,36 @@ export const Guilds = ({ handleGuildSelect }: Props) => {
       icon: "null",
       owner: true,
     },
+    {
+      id: "3",
+      name: "Galera do Game",
+      icon: "null",
+      owner: true,
+    },
+    {
+      id: "4",
+      name: "Galera do Game",
+      icon: "null",
+      owner: true,
+    },
+    {
+      id: "5",
+      name: "Galera do Game",
+      icon: "null",
+      owner: true,
+    },
+    {
+      id: "6",
+      name: "Galera do Game",
+      icon: "null",
+      owner: true,
+    },
+    {
+      id: "7",
+      name: "Galera do Game",
+      icon: "null",
+      owner: true,
+    },
   ];
 
   return (
@@ -34,7 +64,8 @@ export const Guilds = ({ handleGuildSelect }: Props) => {
         renderItem={({ item }) => (
           <GuildItem data={item} onPress={() => handleGuildSelect(item)} />
         )}
-        ItemSeparatorComponent={() => <ListDivider />}
+        ItemSeparatorComponent={() => <ListDivider isCentered />}
+        contentContainerStyle={{ paddingBottom: 68 }}
       />
     </View>
   );
