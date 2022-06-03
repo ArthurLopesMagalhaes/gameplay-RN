@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import { StatusBar, View } from "react-native";
+import { StatusBar, LogBox } from "react-native";
+
+LogBox.ignoreLogs([
+  "You are not currently signed in to Expo on your development machine",
+]);
 
 import * as SplashScreen from "expo-splash-screen";
 import * as Font from "expo-font";
@@ -13,31 +17,20 @@ import {
   Rajdhani_500Medium,
   Rajdhani_700Bold,
 } from "@expo-google-fonts/rajdhani";
+import { AuthProvider } from "./src/contexts/authContext";
+import AppLoading from "expo-app-loading";
 
 function App() {
-  const [appIsReady, setAppIsReady] = useState(false);
+  const [fontsLoaded] = Font.useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Rajdhani_500Medium,
+    Rajdhani_700Bold,
+  });
 
-  useEffect(() => {
-    async function prepare() {
-      try {
-        SplashScreen.preventAutoHideAsync();
-        // Pre-load fonts, make any API calls you need to do here
-        await Font.loadAsync({
-          Inter_400Regular,
-          Inter_500Medium,
-          Rajdhani_500Medium,
-          Rajdhani_700Bold,
-        });
-      } catch (e) {
-        console.warn(e);
-      } finally {
-        setAppIsReady(true);
-        SplashScreen.hideAsync();
-      }
-    }
-
-    prepare();
-  }, []);
+  if (!fontsLoaded) {
+    return <AppLoading />;
+  }
 
   return (
     <Background>
@@ -47,9 +40,35 @@ function App() {
         barStyle="light-content"
         translucent={true}
       />
-      <MainRoutes />
+      <AuthProvider>
+        <MainRoutes />
+      </AuthProvider>
     </Background>
   );
 }
 
 export default gestureHandlerRootHOC(App);
+
+// const [appIsReady, setAppIsReady] = useState(false);
+
+//   useEffect(() => {
+//     async function prepare() {
+//       try {
+//         SplashScreen.preventAutoHideAsync();
+//         // Pre-load fonts, make any API calls you need to do here
+//         await Font.loadAsync({
+//           Inter_400Regular,
+//           Inter_500Medium,
+//           Rajdhani_500Medium,
+//           Rajdhani_700Bold,
+//         });
+//       } catch (e) {
+//         console.warn(e);
+//       } finally {
+//         setAppIsReady(true);
+//         SplashScreen.hideAsync();
+//       }
+//     }
+
+//     prepare();
+//   }, []);

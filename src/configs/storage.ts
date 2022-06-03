@@ -1,0 +1,6 @@
+const STORAGE_NAME = "@gameplay";
+
+const COLLECTION_USERS = `${STORAGE_NAME}:user`;
+const COLLECTION_APPOITMENTS = `${STORAGE_NAME}:appointments`;
+
+export { COLLECTION_USERS, COLLECTION_APPOITMENTS };

@@ -7,7 +7,7 @@ import { SignIn } from "../screens/SignIn";
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
-export const AuthRoutes = () => {
+export const AppRoutes = () => {
   return (
     <Navigator
       screenOptions={{
@@ -17,7 +17,6 @@ export const AuthRoutes = () => {
         },
       }}
     >
-      <Screen name="SignIn" component={SignIn} />
       <Screen name="Home" component={Home} />
       <Screen name="AppointmentDetails" component={AppointmentDetails} />
       <Screen name="AppointmentCreate" component={AppointmentCreate} />
