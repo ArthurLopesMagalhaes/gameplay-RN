@@ -4,96 +4,21 @@ import { styles } from "./styles";
 import { Profile } from "../../components/Profile";
 import { ButtonAdd } from "../../components/ButtonAdd";
 import { CategorySelect } from "../../components/CategorySelect";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { ListHeader } from "../../components/ListHeader";
-import { Appoitment } from "../../components/Appointment";
+import { AppointmentProps, Appoitment } from "../../components/Appointment";
 import { ListDivider } from "../../components/ListDivider";
 import { Background } from "../../components/Background";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { COLLECTION_APPOITMENTS } from "../../configs/storage";
+import { Load } from "../../components/Load";
 
 export const Home = () => {
   const [category, setCategory] = useState("");
+  const [loadingAppointments, setLoadAppointments] = useState(true);
 
-  const appointments = [
-    {
-      id: "43",
-      guild: {
-        id: "1",
-        name: "Lendarios",
-        icon: null,
-        owner: true,
-      },
-      category: "1",
-      date: "22/06 às 22:00h",
-      description:
-        "É hoje que vamos chegar ao challenger sem perder uma partida da md10",
-    },
-    {
-      id: "34",
-      guild: {
-        id: "1",
-        name: "Lendarios",
-        icon: null,
-        owner: true,
-      },
-      category: "1",
-      date: "22/06 às 22:00h",
-      description:
-        "É hoje que vamos chegar ao challenger sem perder uma partida da md10",
-    },
-    {
-      id: "1",
-      guild: {
-        id: "1",
-        name: "Lendarios",
-        icon: null,
-        owner: true,
-      },
-      category: "1",
-      date: "22/06 às 22:00h",
-      description:
-        "É hoje que vamos chegar ao challenger sem perder uma partida da md10",
-    },
-    {
-      id: "2",
-      guild: {
-        id: "1",
-        name: "Lendarios",
-        icon: null,
-        owner: true,
-      },
-      category: "1",
-      date: "22/06 às 22:00h",
-      description:
-        "É hoje que vamos chegar ao challenger sem perder uma partida da md10",
-    },
-    {
-      id: "3",
-      guild: {
-        id: "1",
-        name: "Lendarios",
-        icon: null,
-        owner: true,
-      },
-      category: "1",
-      date: "22/06 às 22:00h",
-      description:
-        "É hoje que vamos chegar ao challenger sem perder uma partida da md10",
-    },
-    {
-      id: "4",
-      guild: {
-        id: "1",
-        name: "Lendarios",
-        icon: null,
-        owner: true,
-      },
-      category: "1",
-      date: "22/06 às 22:00h",
-      description:
-        "É hoje que vamos chegar ao challenger sem perder uma partida da md10",
-    },
-  ];
+  const [appointments, setAppointmnets] = useState<AppointmentProps[]>([]);
 
   const navigation = useNavigation();
 
@@ -101,12 +26,32 @@ export const Home = () => {
     categoryId === category ? setCategory("") : setCategory(categoryId);
   };
 
-  const handleAppointmentDetails = () => {
-    navigation.navigate("AppointmentDetails");
+  const handleAppointmentDetails = (guildSelected: AppointmentProps) => {
+    navigation.navigate("AppointmentDetails", {
+      guildSelected,
+    });
   };
   const handleAppointmentCreate = () => {
     navigation.navigate("AppointmentCreate");
   };
+
+  const loadAppoitments = async () => {
+    const response = await AsyncStorage.getItem(COLLECTION_APPOITMENTS);
+    const storage: AppointmentProps[] = response ? JSON.parse(response) : [];
+
+    if (category) {
+      setAppointmnets(storage.filter((item) => item.category === category));
+    } else {
+      setAppointmnets(storage);
+    }
+    setLoadAppointments(false);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadAppoitments();
+    }, [category])
+  );
 
   return (
     <Background>
@@ -120,18 +65,30 @@ export const Home = () => {
         setCategory={handleCategorySelect}
       />
 
-      <ListHeader title="Partidas agendadas" subtitle={`Total ${"6"}`} />
-      <FlatList
-        data={appointments}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Appoitment data={item} onPress={handleAppointmentDetails} />
-        )}
-        ItemSeparatorComponent={() => <ListDivider />}
-        style={styles.matches}
-        contentContainerStyle={{ paddingBottom: 69 }}
-        showsVerticalScrollIndicator={false}
-      />
+      {loadingAppointments ? (
+        <Load />
+      ) : (
+        <>
+          <ListHeader
+            title="Partidas agendadas"
+            subtitle={`Total ${appointments.length}`}
+          />
+          <FlatList
+            data={appointments}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <Appoitment
+                data={item}
+                onPress={() => handleAppointmentDetails(item)}
+              />
+            )}
+            ItemSeparatorComponent={() => <ListDivider />}
+            style={styles.matches}
+            contentContainerStyle={{ paddingBottom: 69 }}
+            showsVerticalScrollIndicator={false}
+          />
+        </>
+      )}
     </Background>
   );
 };

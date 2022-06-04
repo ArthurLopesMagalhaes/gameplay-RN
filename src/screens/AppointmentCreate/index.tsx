@@ -25,11 +25,22 @@ import { Button } from "../../components/Button";
 import { ModalView } from "../../components/ModalView";
 import { Guilds } from "../Guilds";
 import { GuildProps } from "../../components/GuildItem";
+import { dateMask } from "../../helpers/scheduleFormatter";
+import uuid from "react-native-uuid";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { COLLECTION_APPOITMENTS } from "../../configs/storage";
+import { useNavigation } from "@react-navigation/native";
 
 export const AppointmentCreate = () => {
   const [category, setCategory] = useState("");
   const [openGuildsModal, setOpenGuildsModal] = useState(false);
   const [guild, setGuild] = useState<GuildProps>({} as GuildProps);
+
+  const [date, setDate] = useState("");
+  const [hour, setHour] = useState("");
+  const [description, setDescription] = useState("");
+
+  const navigation = useNavigation();
 
   const handleOpenGuilds = () => {
     setOpenGuildsModal(true);
@@ -45,6 +56,24 @@ export const AppointmentCreate = () => {
 
   const handleCategorySelect = (categoryId: string) => {
     setCategory(categoryId);
+  };
+
+  const handleSave = async () => {
+    const newAppoitment = {
+      id: uuid.v4(),
+      guild,
+      category,
+      date: `${date} às ${hour}`,
+      description,
+    };
+
+    const storage = await AsyncStorage.getItem(COLLECTION_APPOITMENTS);
+    const appoitments = storage ? JSON.parse(storage) : [];
+    await AsyncStorage.setItem(
+      COLLECTION_APPOITMENTS,
+      JSON.stringify([...appoitments, newAppoitment])
+    );
+    navigation.navigate("Home");
   };
 
   return (
@@ -73,7 +102,11 @@ export const AppointmentCreate = () => {
           <View style={styles.form}>
             <RectButton onPress={handleOpenGuilds}>
               <View style={styles.select}>
-                {guild.icon ? <GuildIcon /> : <View style={styles.image} />}
+                {guild.icon ? (
+                  <GuildIcon guildId={guild.id} iconId={guild.icon} />
+                ) : (
+                  <View style={styles.image} />
+                )}
                 <View style={styles.selectBody}>
                   <Text style={styles.label}>
                     {guild.name ? guild.name : "Selecione um servidor"}
@@ -95,6 +128,8 @@ export const AppointmentCreate = () => {
                   maxLength={5}
                   placeholder="dd/mm"
                   placeholderTextColor={theme.colors.heading}
+                  // value={dateMask(date)}
+                  onChangeText={(txt) => setDate(txt)}
                 />
               </View>
               <View>
@@ -103,6 +138,8 @@ export const AppointmentCreate = () => {
                   maxLength={5}
                   placeholder="hh/mm"
                   placeholderTextColor={theme.colors.heading}
+                  // value={dateMask(date)}
+                  onChangeText={(txt) => setHour(txt)}
                 />
               </View>
             </View>
@@ -115,9 +152,10 @@ export const AppointmentCreate = () => {
               maxLength={100}
               numberOfLines={5}
               autoCorrect={false}
+              onChangeText={(txt) => setDescription(txt)}
             />
             <View style={styles.footer}>
-              <Button title="Agendar" />
+              <Button title="Agendar" onPress={handleSave} />
             </View>
           </View>
         </Background>
